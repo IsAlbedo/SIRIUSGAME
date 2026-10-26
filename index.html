@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arquitectos del Código · La Reconstrucción Digital</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏗</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* prompt de la terminal (mismo estilo que el de registros) */
+    #aviso-terminal{
+      position:fixed; bottom:150px; left:50%; transform:translateX(-50%); z-index:15;
+      font:700 13px var(--fuente-titulo); letter-spacing:.22em; color:#bff7ea; pointer-events:none;
+      background:rgba(10,16,28,.85); border:1px solid rgba(88,240,160,.6); padding:8px 16px;
+      animation:latirPrompt 1.2s ease-in-out infinite;
+    }
+    /* Blockly sobre el tema oscuro */
+    .blocklyToolboxDiv{ background:#0e1628 !important; }
+    .blocklyTreeLabel{ color:#dfe9f5 !important; font-family:var(--fuente-texto) !important; font-size:15px !important; font-weight:700; }
+    .blocklyTreeSelected .blocklyTreeLabel{ color:#fff !important; }
+    .blocklyFlyoutBackground{ fill:#16203a !important; fill-opacity:.97 !important; }
+    .blocklyFlyoutLabelText{ fill:#dfe9f5 !important; }
+    .blocklyHtmlInput{ color:#081018 !important; background:#fff !important; }
+    .blocklyDropDownDiv, .blocklyDropDownDiv .goog-menuitem, .blocklyMenuItem, .blocklyMenuItemContent{ color:#081018 !important; }
+    .blocklyWidgetDiv .blocklyMenuItem, .blocklyWidgetDiv .blocklyMenuItemContent{ color:#081018 !important; }
+
+    /* objetivos paso a paso: se leen con negritas y código resaltado */
+    #editor-objetivo, #cls-objetivo, #her-objetivo, #gob-objetivo{
+      max-height:24vh; overflow-y:auto; line-height:1.5;
+    }
+    .contexto b{ color:#ffd27a; }
+    .contexto code{
+      font-family:ui-monospace,Consolas,monospace; font-size:.92em;
+      color:#bff7ea; background:rgba(88,240,160,.12);
+      border:1px solid rgba(88,240,160,.25); padding:0 5px; border-radius:3px; 
+    }
+    /* leyenda bajo la vista aérea */
+    #aerea-leyenda{ line-height:1.45; margin-bottom:6px; }
+    #aerea-leyenda:empty{ display:none; }
+    /* El layout de los editores (pantalla completa, botones, consola footer) vive en css/styles.css */
+  </style>
+</head>
+<body>
+
+  <canvas id="escena"></canvas>
+
+  <!-- ══════════ HUD (compacto, reorganizado) ══════════ -->
+   <!-- ══════════ HUD · 4 zonas fijas ══════════ -->
+  <div id="hud" class="oculto">
+
+    <div id="mira">
+      <i class="arriba"></i><i class="abajo"></i><i class="izq"></i><i class="der"></i><b></b>
+    </div>
+
+    <!-- ZONA 1 · ARRIBA-IZQUIERDA: vida y resistencia -->
+    <div id="panel-estado" class="panel panel-estado">
+      <div class="fila-dato fila-vida">
+        <span class="etq" id="etq-vida"></span>
+        <span id="vida-num" class="num">100</span>
+      </div>
+      <div class="barra barra-vida"><div id="vida-fill"></div></div>
+      <div class="fila-dato fila-res">
+        <span class="etq" id="etq-resistencia"></span>
+      </div>
+      <div class="barra barra-res"><div id="res-fill"></div></div>
+    </div>
+
+    <!-- ZONA 2 · ARRIBA-DERECHA: misión + herramientas -->
+    <div id="panel-nivel" class="panel panel-nivel">
+      <div class="nivel-cab">
+        <span id="hud-nivel-num" class="num num-chica">N—</span>
+        <span id="hud-nivel-nombre" class="nivel-nombre"></span>
+        <button id="mision-toggle" class="btn-icon" title="Ver misión (M)">▾</button>
+      </div>
+      <div id="hud-nivel-sector" class="mini"></div>
+      <div id="mision-resumen" class="mini mision-resumen"></div>
+      <ul id="mision-detalle" class="mision-detalle"></ul>
+
+      <div class="nivel-cab herr-cab">
+        <span class="etq" id="etq-herramientas"></span>
+        <button id="herramientas-toggle" class="btn-icon" title="Ver herramientas">▾</button>
+      </div>
+      <div id="hud-herramientas" class="herr-mini-caja"></div>
+      <div id="hud-herramientas-panel" class="herr-detalle"></div>
+    </div>
+
+    <!-- ZONA 3 · ABAJO-CENTRO: progreso del nivel -->
+    <div id="panel-progreso" class="panel panel-progreso">
+      <div class="prog-cab">
+        <span class="etq" id="etq-progreso"></span>
+        <span id="prog-num" class="num num-chica">0/0</span>
+      </div>
+      <div class="barra barra-prog"><div id="prog-fill"></div></div>
+      <div class="prog-pie">
+        <button id="btn-pista" class="btn btn-sec btn-chico"></button>
+        <span id="pistas-info" class="mini"></span>
+        <span class="mini" id="hud-registros"></span>
+      </div>
+    </div>
+
+    <!-- ZONA 4 · ABAJO-IZQUIERDA: FPS y coordenadas -->
+    <div id="panel-sistema" class="panel-sistema">
+      <span id="fps-num" class="fps-num">—</span>
+      <span class="etq" id="etq-fps"></span>
+      <span class="sep">·</span>
+      <span id="ms-num" class="ms-num">—</span><span class="etq">ms</span>
+      <span class="sep">·</span>
+      <span id="pos-num" class="pos-num">0,0</span>
+    </div>
+
+    <!-- avisos (no son zonas: aparecen y desaparecen) -->
+    <div id="aviso"></div>
+    <div id="aviso-registro" class="oculto"></div>
+    <div id="aviso-terminal" class="oculto"></div>
+    <div id="flash-dano"></div>
+    <div id="notif-terminal"><span class="notif-ico">⚠</span> BUSCA LA TERMINAL</div>
+
+    <!-- INDICADOR MODO PUNTERO LIBRE -->
+    <div id="modo-libre">PUNTERO LIBRE · Alt para volver</div>
+  </div>
+
+  <!-- ══════════ PANEL DE DIÁLOGO ══════════ -->
+  <div id="panel-dialogo" class="oculto">
+    <div id="dialogo-retrato" class="retrato retrato-aria">
+      <div class="retrato-anillo"></div>
+      <div class="retrato-nucleo"></div>
+      <div class="retrato-scan"></div>
+    </div>
+    <div id="dialogo-caja">
+      <div id="dialogo-nombre"></div>
+      <div id="dialogo-texto"></div>
+      <div id="dialogo-opciones"></div>
+      <div id="dialogo-pie">
+        <span id="dialogo-continuar" class="oculto">▼ CONTINUAR</span>
+        <button id="btn-saltar" class="btn btn-sec btn-chico">SALTAR ⏭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CINEMÁTICA (overlay negro) ══════════ -->
+  <div id="cine" class="oculto"></div>
+
+  <!-- ══════════ INTRO DE NIVEL (controles solo aquí) ══════════ -->
+  <div id="pantalla-intro" class="pantalla oculto">
+    <div class="pantalla-caja">
+      <div class="overlay-marca" id="intro-marca"></div>
+      <h2 id="intro-titulo"></h2>
+      <p class="contexto" id="intro-contexto"></p>
+      <div class="fila-botones">
+        <button id="btn-controles" class="btn btn-sec btn-chico" type="button"></button>
+        <button id="btn-ajustes-intro" class="btn btn-sec btn-chico" type="button"></button>
+      </div>
+      <div class="intro-controles oculto" id="intro-controles"></div>
+      <div class="fila-botones">
+        <button id="btn-comenzar" class="btn"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ RESULTADO ══════════ --> 
+  <div id="pantalla-resultado" class="pantalla oculto">
+    <div class="pantalla-caja">
+      <h2 id="resultado-titulo"></h2>
+      <p class="contexto" id="resultado-mensaje"></p>
+      <div id="res-estrellas" class="res-estrellas" role="img"></div>
+      <div class="stats">
+        <div><span class="etq" id="etq-res-puntos"></span><span id="res-puntos" class="num num-chica">0</span></div>
+        <div><span class="etq" id="etq-res-tiempo"></span><span id="res-tiempo" class="num num-chica">0 s</span></div>
+        <div><span class="etq" id="etq-res-objetivos"></span><span id="res-objetivos" class="num num-chica">—</span></div>
+      </div>
+      <div id="res-desglose-caja" class="oculto">
+        <div class="etq" id="etq-res-desglose"></div>
+        <ul id="res-desglose" class="res-desglose"></ul>
+      </div>
+      <div id="res-aprendido-caja" class="oculto">
+        <div class="etq" id="etq-res-aprendido"></div>
+        <p class="contexto" id="res-aprendido-texto"></p>
+        <p class="mini" id="res-aprendido-temas"></p>
+      </div>
+      <div id="res-premios-caja" class="oculto">
+        <div class="etq" id="etq-res-premios"></div>
+        <ul id="res-premios" class="res-premios"></ul>
+      </div>
+      <div class="fila-botones">
+        <button id="btn-siguiente" class="btn"></button>
+        <button id="btn-repetir" class="btn btn-sec"></button>
+        <button id="btn-menu-r" class="btn btn-sec"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CIERRE ══════════ -->
+  <div id="pantalla-cierre" class="pantalla oculto">
+    <div class="pantalla-caja">
+      <div class="overlay-marca" id="cierre-marca"></div>
+      <h2 id="cierre-titulo"></h2>
+      <p class="contexto" id="cierre-texto"></p>
+      <p class="contexto">PUNTUACIÓN TOTAL: <b id="cierre-puntos">0</b></p>
+      <div id="cierre-guion" class="cierre-guion"></div>
+      <div class="etq" style="margin-top:12px">CONCEPTOS APRENDIDOS</div>
+      <ul id="cierre-conceptos" class="cierre-lista"></ul>
+      <div class="etq" id="etq-cierre-logros" style="margin-top:12px"></div>
+      <ul id="cierre-logros" class="cierre-lista"></ul>
+      <div class="etq" style="margin-top:12px">CRÉDITOS</div>
+      <ul id="cierre-creditos" class="cierre-lista"></ul>
+      <div class="fila-botones">
+        <button id="btn-reinicio" class="btn btn-sec"></button>
+        <button id="btn-menu-c" class="btn btn-sec"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ MENÚ / PAUSA (simplificado) ══════════ -->
+  <div id="overlay" class="oculto">
+    <div class="overlay-caja overlay-simple">
+      <h1><span id="ov-titulo"></span><span id="ov-titulo-acento"></span></h1>
+      <p class="overlay-sub" id="overlay-sub"></p>
+      <button id="btn-jugar" class="btn"></button>
+      <div class="fila-ajustes"><button id="btn-ajustes" class="btn btn-sec btn-chico" type="button"></button></div>
+      <p id="overlay-estado" class="overlay-nota"></p>
+    </div>
+  </div>
+
+  <!-- ══════════ EDITOR / CONSOLA DEL ARQUITECTO (Niveles 1-2, bloques) ══════════ -->
+      <div id="pantalla-editor" class="pantalla oculto">
+    <div class="editor-caja">
+      <div id="editor-leccion">
+        <div class="leccion-tab">📖 <span id="editor-subreto"></span> · LECCIÓN</div>
+        <div class="leccion-panel">
+          <div id="editor-objetivo" class="contexto"></div>
+        </div>
+      </div>
+      <div class="editor-cuerpo">
+        <div class="editor-bloques-wrap">
+          <div id="editor-bloques"></div>
+          <div class="editor-acciones">
+            <button id="btn-ejecutar" class="btn" title="Ejecuta tu programa desde el inicio del reto">▶ EJECUTAR</button>
+            <button id="btn-detener" class="btn btn-sec" title="Detiene y reinicia el mapa; tus bloques se quedan" disabled>⏹ DETENER</button>
+          </div>
+        </div>
+        <div class="editor-lateral">
+          <div class="etq">VISTA AÉREA</div>
+          <canvas id="vista-aerea" width="320" height="320"></canvas>
+          <div id="aerea-leyenda" class="mini"></div>
+          <div class="etq">CÓDIGO EQUIVALENTE</div>
+          <pre id="editor-codigo"></pre>
+          <div id="editor-info" class="mini"></div>
+          <div class="editor-acciones-der">
+            <button id="btn-pista-editor" class="btn btn-sec" title="Aria te da una pista para este reto">💡 PISTA</button>
+            <button id="btn-cerrar-editor" class="btn btn-sec" title="Volver al mundo en 3D">✓ VOLVER</button>
+          </div>
+        </div>
+        <div class="editor-pie">
+          <div class="etq">CONSOLA</div>
+          <div id="editor-consola"></div>
+        </div>
+      </div>
+    </div>
+    <div id="editor-prediccion" class="oculto">
+      <div class="pantalla-caja">
+        <h2>PREDICE ANTES DE EJECUTAR</h2>
+        <p class="contexto" id="pred-pregunta"></p>
+        <pre id="pred-codigo"></pre>
+        <div class="fila-botones" id="pred-opciones"></div>
+      </div>
+    </div>
+  </div>
+
+    <!-- ══════════ EDITOR DE CLASES (Nivel 3+) ══════════ -->
+  <div id="pantalla-editor-clases" class="pantalla oculto">
+    <div class="leccion-wrap">
+      <div class="leccion-tab">📖 <span id="cls-subreto"></span> · LECCIÓN</div>
+      <div class="leccion-panel">
+        <div id="cls-objetivo" class="contexto"></div>
+      </div>
+    </div>
+    <div class="editor-caja">
+      <div class="editor-cabecera">
+        <div class="editor-botones">
+          <button id="btn-cls-ejecutar" class="btn" title="Ejecuta el código del panel derecho">▶ EJECUTAR</button>
+          <button id="btn-cls-generar" class="btn btn-sec" title="Escribe el código a partir de la ficha del molde">⟳ GENERAR DESDE LA FICHA</button>
+          <button id="btn-cls-comprobar" class="btn oculto" title="Revisa tus respuestas">COMPROBAR</button>
+          <button id="btn-cls-pista" class="btn btn-sec" title="Aria te da una pista para este reto">💡 PISTA</button>
+          <button id="btn-cls-cerrar" class="btn btn-sec" title="Volver al mundo en 3D">✓ VOLVER</button>
+        </div>
+      </div>
+      <div id="cls-medidores" class="mini"></div>
+
+      <div class="editor-cuerpo">
+        <div class="cls-izq">
+          <div id="cls-clasificacion" class="oculto">
+            <div class="etq">CLASIFICA CADA ELEMENTO</div>
+            <div id="cls-elementos"></div>
+          </div>
+          <div id="cls-zona-codigo">
+            <div id="ficha-paleta" class="paleta-chips">
+              <span class="chip" draggable="true" data-chip="chipNum">+ atributo num</span>
+              <span class="chip" draggable="true" data-chip="chipTexto">+ atributo texto</span>
+              <span class="chip" draggable="true" data-chip="chipBool">+ atributo bool</span>
+              <span class="chip" draggable="true" data-chip="chipTrabajar">método trabajar()</span>
+              <span class="chip" draggable="true" data-chip="chipDescansar">método descansar()</span>
+              <span class="chip" draggable="true" data-chip="chipComunicarse">método comunicarse()</span>
+            </div>
+            <div class="ficha">
+              <div class="ficha-cab">
+                <span class="etq">CLASE</span>
+                <input id="ficha-nombre" value="Ciudadano">
+                <label class="chk"><input type="checkbox" id="ficha-constructor"> constructor</label>
+              </div>
+              <div class="etq">ATRIBUTOS (suelta aquí los chips)</div>
+              <div id="ficha-atributos" class="zona-ficha"></div>
+              <div class="etq">MÉTODOS (suelta aquí las plantillas)</div>
+              <div id="ficha-metodos" class="zona-ficha"></div>
+            </div>
+          </div>
+        </div>
+        <div class="editor-lateral">
+          <div class="etq">CÓDIGO (editable — esto es lo que se ejecuta)</div>
+          <textarea id="cls-codigo" spellcheck="false"></textarea>
+        </div>
+        <div class="editor-pie">
+          <div class="etq">CONSOLA</div>
+          <div id="cls-consola"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EDITOR DE HERENCIA (Nivel 4) ══════════ -->
+  <div id="pantalla-editor-herencia" class="pantalla oculto">
+    <div class="leccion-wrap">
+      <div class="leccion-tab">📖 <span id="her-subreto"></span> · LECCIÓN</div>
+      <div class="leccion-panel">
+        <div id="her-objetivo" class="contexto"></div>
+        <div id="her-calentamiento" class="oculto calentamiento">
+          <b id="her-calentamiento-titulo"></b>
+          <p id="her-calentamiento-texto"></p>
+          <button id="her-calentamiento-ver" class="btn btn-sec btn-chico">VER CÓDIGO</button>
+          <pre id="her-calentamiento-codigo" class="oculto"></pre>
+        </div>
+      </div>
+    </div>
+    <div class="editor-caja">
+      <div class="editor-cabecera">
+        <div class="editor-botones">
+          <button id="btn-her-ejecutar" class="btn" title="Ejecuta el código del panel derecho">▶ EJECUTAR</button>
+          <button id="btn-her-generar" class="btn btn-sec" title="Escribe el código a partir del diagrama">⟳ GENERAR DESDE EL DIAGRAMA</button>
+          <button id="btn-her-conectar" class="btn btn-sec" title="Une dos clases con una relación «es-un»">🔗 CONECTAR ES-UN</button>
+          <button id="btn-her-comprobar" class="btn oculto" title="Revisa tus respuestas">COMPROBAR</button>
+          <button id="btn-her-pista" class="btn btn-sec" title="Aria te da una pista para este reto">💡 PISTA</button>
+          <button id="btn-her-cerrar" class="btn btn-sec" title="Volver al mundo en 3D">✓ VOLVER</button>
+        </div>
+      </div>
+
+      <div class="editor-cuerpo">
+        <div class="cls-izq">
+          <div id="her-juego" class="oculto">
+            <div class="etq">¿HERENCIA O COMPOSICIÓN?</div>
+            <div id="her-relaciones"></div>
+          </div>
+          <div id="her-diagrama" class="her-diagrama"></div>
+          <div id="her-paleta" class="paleta-chips"></div>
+        </div>
+        <div class="editor-lateral">
+          <div class="etq">CÓDIGO (editable — esto es lo que se ejecuta)</div>
+          <textarea id="her-codigo" spellcheck="false"></textarea>
+        </div>
+        <div class="editor-pie">
+          <div class="etq">CONSOLA</div>
+          <div id="her-consola"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EDITOR DE INTERFACES (Nivel 5) ══════════ -->
+  <div id="pantalla-editor-gobierno" class="pantalla oculto">
+    <div class="leccion-wrap">
+      <div class="leccion-tab">📖 <span id="gob-subreto"></span> · LECCIÓN</div>
+      <div class="leccion-panel">
+        <div id="gob-objetivo" class="contexto"></div>
+      </div>
+    </div>
+    <div class="editor-caja">
+      <div class="editor-cabecera">
+        <div class="editor-botones">
+          <button id="btn-gob-ejecutar" class="btn" title="Ejecuta el código del panel derecho">▶ EJECUTAR</button>
+          <button id="btn-gob-generar" class="btn btn-sec" title="Escribe el código a partir de los componentes conectados">⟳ GENERAR DESDE EL PANEL</button>
+          <button id="btn-gob-comprobar" class="btn oculto" title="Revisa tus respuestas">COMPROBAR</button>
+          <button id="btn-gob-pista" class="btn btn-sec" title="Aria te da una pista para este reto">💡 PISTA</button>
+          <button id="btn-gob-cerrar" class="btn btn-sec" title="Volver al mundo en 3D">✓ VOLVER</button>
+        </div>
+      </div>
+      <div class="editor-cuerpo">
+        <div class="cls-izq">
+          <div id="gob-juego" class="oculto"><div id="gob-situaciones"></div></div>
+          <div id="gob-panel">
+            <div class="etq">CONTRATO · ENCHUFA COMPONENTES AQUÍ</div>
+            <div id="gob-interfaz" class="gob-interfaz">
+              <b>interface IResponsable</b>
+              <div id="gob-metodos-interfaz"></div>
+            </div>
+            <div class="etq" style="margin-top:10px">COMPONENTES (arrastra al contrato)</div>
+            <div id="gob-componentes" class="gob-componentes"></div>
+            <div class="mini" style="margin-top:8px">CONECTADOS: <span id="gob-conectados"></span></div>
+          </div>
+        </div>
+        <div class="editor-lateral">
+          <div class="etq">CÓDIGO (editable — esto es lo que se ejecuta)</div>
+          <textarea id="gob-codigo" spellcheck="false"></textarea>
+        </div>
+        <div class="editor-pie">
+          <div class="etq">CONSOLA</div>
+          <div id="gob-consola"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PANEL DEBUG (F2) ══════════ -->
+  <div id="debug" class="oculto">
+    <div class="debug-titulo">DEBUG · F2</div>
+    <div id="dbg-fps" class="debug-linea">FPS —</div>
+    <div id="dbg-ms" class="debug-linea">MS —</div>
+    <div id="dbg-render" class="debug-linea">draws —</div>
+    <div id="dbg-mem" class="debug-linea">geom — · tex —</div>
+    <div id="dbg-prog" class="debug-linea">programs —</div>
+    <div class="debug-fila">
+      <button data-accion="ir" data-nivel="0">N1</button>
+      <button data-accion="ir" data-nivel="1">N2</button>
+      <button data-accion="ir" data-nivel="2">N3</button>
+      <button data-accion="ir" data-nivel="3">N4</button>
+      <button data-accion="ir" data-nivel="4">N5</button>
+    </div>
+    <div class="debug-fila">
+      <button data-accion="objetivo">✓ Objetivo</button>
+      <button data-accion="fallar">✗ Fallar</button>
+      <button data-accion="cine">Cine intro</button>
+      <button data-accion="menu">Menú</button>
+      <button data-accion="reset">Reset progreso</button>
+    </div>
+  </div>
+
+  <!-- feedback transversal -->
+  <canvas id="feedback-canvas"></canvas>
+  <div id="feedback-check"></div>
+  <div id="feedback-warning"></div>
+  <div id="logro-toast" class="oculto-visible">
+    <div id="logro-nombre"></div>
+    <div id="logro-texto"></div>
+  </div>
+
+  <!-- ajustes del jugador: tema, fuente, tamaño y voz de ARIA -->
+  <div id="panel-ajustes" class="pantalla oculto" role="dialog" aria-modal="true" aria-labelledby="aj-titulo">
+    <div class="pantalla-caja">
+      <h2 id="aj-titulo"></h2>
+      <div id="aj-grupos"></div>
+      <p id="aj-nota" class="mini aj-nota"></p>
+      <div class="fila-botones">
+        <button id="aj-cerrar" class="btn" type="button"></button>
+        <button id="aj-restablecer" class="btn btn-sec" type="button"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- consentimiento (primera vez) -->
+  <div id="consentimiento" class="oculto">
+    <div class="cons-caja">
+      <h2 id="cons-titulo"></h2>
+      <p id="cons-texto"></p>
+      <p id="cons-id" class="mini"></p>
+      <div class="fila-botones">
+        <button id="btn-consentir" class="btn"></button>
+        <button id="btn-rechazar" class="btn btn-sec"></button>
+      </div>
+    </div> 
+  </div>
+
+  <!-- panel oculto de investigador (teclear D-A-T-O-S) -->
+  <div id="panel-investigador" class="oculto">
+    <div class="inv-cab">PANEL DE INVESTIGACIÓN <button id="inv-cerrar" class="btn btn-sec btn-chico">✕</button></div>
+    <p class="mini">Participante: <b id="inv-participante"></b></p>
+    <p class="mini">Consentimiento: <b id="inv-consentimiento"></b> · Telemetría: <b id="inv-activo"></b></p>
+    <p class="mini" id="inv-resumen"></p>
+    <div class="debug-fila">
+      <button id="inv-json" class="btn btn-sec btn-chico">⬇ JSON completo</button>
+      <button id="inv-csv-sesiones" class="btn btn-sec btn-chico">⬇ CSV sesiones</button>
+      <button id="inv-csv-niveles" class="btn btn-sec btn-chico">⬇ CSV niveles</button>
+      <button id="inv-csv-intentos" class="btn btn-sec btn-chico">⬇ CSV intentos</button>
+    </div>
+    <div class="debug-fila">
+      <button id="inv-consentir" class="btn btn-sec btn-chico">Activar telemetría</button>
+      <button id="inv-limpiar" class="btn btn-sec btn-chico">Borrar datos</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/msg/es.js"></script>
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="ui/controlesFlotante.js"></script>
+
+</body>
+</html> 

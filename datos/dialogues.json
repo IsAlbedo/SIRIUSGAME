@@ -1,0 +1,96 @@
+{
+  "dialogos": {
+    "cine-01": { "id": "cine-01", "hablante": "narrador", "texto": "Año 2148.", "siguiente": null, "opciones": [] },
+    "cine-02": { "id": "cine-02", "hablante": "narrador", "texto": "La Red Neural Global lo controlaba todo.", "siguiente": null, "opciones": [] },
+    "cine-03": { "id": "cine-03", "hablante": "narrador", "texto": "Hasta que un virus llamado Eclipse lo corrompió todo.", "siguiente": null, "opciones": [] },
+    "cine-04": {
+      "id": "cine-04", "hablante": "aria", "siguiente": null,
+      "texto": "¿Me recibes? El enlace es estable... menos mal. Soy Aria: inteligencia de apoyo, creación del Doctor Gustaff. Y tú debes ser el nuevo Arquitecto Digital.",
+      "opciones": [
+        { "texto": "Sí. ¿Por dónde empezamos?", "siguiente": "cine-05a" },
+        { "texto": "Esto es demasiado... No estoy seguro.", "siguiente": "cine-05b" }
+      ]
+    },
+    "cine-05a": { "id": "cine-05a", "hablante": "aria", "texto": "Me gusta esa actitud. La Red Neural Global está en ruinas, pero cada línea de código que escribas la reconstruirá.", "siguiente": "cine-06", "opciones": [] },
+    "cine-05b": { "id": "cine-05b", "hablante": "aria", "texto": "Respira. Gustaff me dijo que el mejor Arquitecto no es el que no tiene miedo, sino el que programa a pesar de él. No estarás solo: yo te acompaño.", "siguiente": "cine-06", "opciones": [] },
+    "cine-06": { "id": "cine-06", "hablante": "aria", "texto": "Tu primera misión: el Sector Alfa. Recuperaremos la memoria de la red, fragmento a fragmento. Alianza de la Reconstrucción... adelante.", "siguiente": null, "opciones": [] },
+
+    "intro-nivel-1": { "id": "intro-nivel-1", "hablante": "aria", "texto": "Sector Alfa: aquí cayó la memoria de la red. Cada fragmento de datos que veas flotando es una variable: guarda un valor, y puede cambiar.", "siguiente": "intro-nivel-1b", "opciones": [] },
+    "intro-nivel-1b": { "id": "intro-nivel-1b", "hablante": "aria", "texto": "El robot de rescate solo obedecerá instrucciones exactas: una detrás de otra, sin atajos.", "siguiente": "intro-nivel-1c", "opciones": [] },
+    "intro-nivel-1c": { "id": "intro-nivel-1c", "hablante": "aria", "texto": "Sin condicionales y bucles, no hay lógica, solo caos.", "siguiente": "intro-nivel-1d", "opciones": [] },
+    "intro-nivel-1d": { "id": "intro-nivel-1d", "hablante": "aria", "texto": "Enséñale a decidir y a repetirse. El laberinto de servidores es tuyo, {arquitecto}.", "siguiente": null, "opciones": [] },
+
+    "intro-nivel-2": { "id": "intro-nivel-2", "hablante": "aria", "texto": "Módulo de Construcción: la ciudad empieza a levantarse, y no podemos escribir cada pared a mano.", "siguiente": "intro-nivel-2b", "opciones": [] },
+    "intro-nivel-2b": { "id": "intro-nivel-2b", "hablante": "aria", "texto": "Una función es como una receta: la defines una vez y la usas muchas veces.", "siguiente": "intro-nivel-2c", "opciones": [] },
+    "intro-nivel-2c": { "id": "intro-nivel-2c", "hablante": "aria", "texto": "Construir pared, colocar puerta, instalar ventana: dales un nombre claro y buenos parámetros.", "siguiente": "intro-nivel-2d", "opciones": [] },
+    "intro-nivel-2d": { "id": "intro-nivel-2d", "hablante": "aria", "texto": "El robot ensamblador está listo. Que empiece la obra.", "siguiente": null, "opciones": [] },
+
+    "intro-nivel-3": { "id": "intro-nivel-3", "hablante": "aria", "texto": "Módulo de Ciudadanía: calles listas, casas listas... pero una ciudad sin ciudadanos es solo un decorado.", "siguiente": "intro-nivel-3b", "opciones": [] },
+    "intro-nivel-3b": { "id": "intro-nivel-3b", "hablante": "aria", "texto": "Una clase es el molde, un objeto es la creación.", "siguiente": "intro-nivel-3c", "opciones": [] },
+    "intro-nivel-3c": { "id": "intro-nivel-3c", "hablante": "aria", "texto": "Del molde Ciudadano nacerán el Agricultor, el Ingeniero, el Médico y el Comerciante: misma base, vidas distintas.", "siguiente": "intro-nivel-3d", "opciones": [] },
+    "intro-nivel-3d": { "id": "intro-nivel-3d", "hablante": "aria", "texto": "Define el molde con cuidado: cada instancia llevará sus propios atributos y métodos.", "siguiente": null, "opciones": [] },
+
+    "intro-nivel-4": { "id": "intro-nivel-4", "hablante": "aria", "texto": "Academia de Especialización. Hoy la simulación es seria: un incendio en pleno centro.", "siguiente": "intro-nivel-4b", "opciones": [] },
+    "intro-nivel-4b": { "id": "intro-nivel-4b", "hablante": "aria", "texto": "Un ciudadano común no puede apagarlo ni atender a los heridos: necesitamos especialistas.", "siguiente": "intro-nivel-4c", "opciones": [] },
+    "intro-nivel-4c": { "id": "intro-nivel-4c", "hablante": "aria", "texto": "La herencia permite que los hijos hereden las características del padre, pero añadan las suyas propias.", "siguiente": "intro-nivel-4d", "opciones": [] },
+    "intro-nivel-4d": { "id": "intro-nivel-4d", "hablante": "aria", "texto": "Que Bombero y Médico hereden de Ciudadano: lo común viene de la base, lo especial lo aportan ellos.", "siguiente": null, "opciones": [] },
+
+    "intro-nivel-5": { "id": "intro-nivel-5", "hablante": "sistema", "texto": "Módulo de Gobierno — Núcleo de la RNG. Alerta: presencia de Eclipse detectada.", "siguiente": "intro-nivel-5b", "opciones": [] },
+    "intro-nivel-5b": { "id": "intro-nivel-5b", "hablante": "eclipse", "texto": "{ARQUITECTO}. HAS LLEGADO AL CORAZÓN DE MI RED. LANZARÉ UNA CATÁSTROFE TRAS OTRA: VEAMOS SI TU CÓDIGO RESISTE.", "siguiente": "intro-nivel-5c", "opciones": [] },
+    "intro-nivel-5c": { "id": "intro-nivel-5c", "hablante": "aria", "texto": "No le mires a él; mírame a mí. La respuesta es el código flexible.", "siguiente": "intro-nivel-5d", "opciones": [] },
+    "intro-nivel-5d": { "id": "intro-nivel-5d", "hablante": "aria", "texto": "El polimorfismo te permite tratar a todos los objetos de manera uniforme, mientras cada uno actúa a su manera.", "siguiente": "intro-nivel-5e", "opciones": [] },
+    "intro-nivel-5e": { "id": "intro-nivel-5e", "hablante": "aria", "texto": "Firma el contrato I Responsable y deja que cada responsable responda a su forma. Es tu momento.", "siguiente": null, "opciones": [] },
+
+    "outro-nivel-1": { "id": "outro-nivel-1", "hablante": "aria", "texto": "¡Memoria recuperada! El Sector Alfa vuelve a recordar... y tú ya piensas en secuencias, condiciones y bucles.", "siguiente": "outro-nivel-1b", "opciones": [] },
+    "outro-nivel-1b": { "id": "outro-nivel-1b", "hablante": "aria", "texto": "El Error de Sintaxis huyó con la cola entre corchetes. Descansa un segundo: la reconstrucción continúa.", "siguiente": null, "opciones": [] },
+
+    "outro-nivel-2": { "id": "outro-nivel-2", "hablante": "aria", "texto": "Viviendas, almacenes y torres de comunicación: todo ensamblado con módulos reutilizados.", "siguiente": "outro-nivel-2b", "opciones": [] },
+    "outro-nivel-2b": { "id": "outro-nivel-2b", "hablante": "aria", "texto": "Si copias el mismo código dos veces, una función está pidiendo nacer. Gustaff lo repetía sin parar.", "siguiente": null, "opciones": [] },
+
+    "outro-nivel-3": { "id": "outro-nivel-3", "hablante": "aria", "texto": "Míralos trabajar: cada ciudadano con sus atributos y métodos, todos nacidos del mismo molde.", "siguiente": "outro-nivel-3b", "opciones": [] },
+    "outro-nivel-3b": { "id": "outro-nivel-3b", "hablante": "aria", "texto": "La ciudad vuelve a respirar. Programar es, en el fondo, crear mundos... y acabas de crear uno.", "siguiente": null, "opciones": [] },
+
+    "outro-nivel-4": { "id": "outro-nivel-4", "hablante": "aria", "texto": "Emergencia resuelta: extinguir fuego por aquí, atender heridos por allá, y ni una línea duplicada.", "siguiente": "outro-nivel-4b", "opciones": [] },
+    "outro-nivel-4b": { "id": "outro-nivel-4b", "hablante": "aria", "texto": "La jerarquía es sólida. Cuando una clase base es buena, sus hijos llegan más lejos.", "siguiente": null, "opciones": [] },
+
+    "outro-nivel-5": { "id": "outro-nivel-5", "hablante": "eclipse", "texto": "IMPOSIBLE... MI CATÁSTROFE, RESUELTA... ESTO NO TERMINA AQUÍ, {ARQUITECTO}.", "siguiente": "outro-nivel-5b", "opciones": [] },
+    "outro-nivel-5b": { "id": "outro-nivel-5b", "hablante": "aria", "texto": "La Red Neural Global vuelve a latir. Secuencias, funciones, objetos, jerarquías y código flexible: lo lograste.", "siguiente": "outro-nivel-5c", "opciones": [] },
+    "outro-nivel-5c": { "id": "outro-nivel-5c", "hablante": "aria", "texto": "Gustaff estaría orgulloso. Y yo... yo también lo estoy. Gracias, {arquitecto}.", "siguiente": null, "opciones": [] },
+
+    "pista-no-entendida": { "id": "pista-no-entendida", "hablante": "aria", "texto": "Gracias por avisarme. Puedes pedirme otra pista con P cuando quieras.", "siguiente": null, "opciones": [] },
+
+    "gustaff-1": { "id": "gustaff-1", "hablante": "gustaff", "texto": "Registro 01 · Gustaff. Si oyes esto, la red ya cayó. No temas a los errores: un programa sin errores es un programa que no intentó nada. Las variables son la memoria de las máquinas; las condiciones, su criterio.", "siguiente": null, "opciones": [] },
+    "gustaff-2": { "id": "gustaff-2", "hablante": "gustaff", "texto": "Registro 02 · Gustaff. Aprendí tarde que el mejor código no es el que escribe más líneas, sino el que menos repite. Nombra bien tus funciones y ellas contarán la historia por ti.", "siguiente": null, "opciones": [] },
+    "gustaff-3": { "id": "gustaff-3", "hablante": "gustaff", "texto": "Registro 03 · Gustaff. Cada ciudadano llevará un trozo de su molde, y también algo que solo él tendrá. Encapsula lo que guardan: los secretos bien protegidos sostienen ciudades enteras.", "siguiente": null, "opciones": [] },
+    "gustaff-4": { "id": "gustaff-4", "hablante": "gustaff", "texto": "Registro 04 · Gustaff. Especializarse no es olvidar lo aprendido: es construir sobre ello. Mis mejores alumnos honraron a su clase base y, a la vez, la superaron.", "siguiente": null, "opciones": [] },
+    "gustaff-5": { "id": "gustaff-5", "hablante": "gustaff", "texto": "Registro 05 · Gustaff. Cuando todo se derrumbe, no preguntes QUÉ es cada cosa: pregunta QUÉ SABE HACER. Ese fue siempre mi último consejo, y será tu mejor defensa contra Eclipse.", "siguiente": null, "opciones": [] }
+  },
+
+  "pistas": {
+    "nivel-1": [
+      "Empieza por lo simple: una instrucción detrás de otra. La secuencia es tu primer superpoder.",
+      "Usa una condición para decidir el camino: «si hay muro, gira». Los if no muerden.",
+      "Si repites los mismos pasos, un bucle puede hacerlo por ti: menos líneas, menos errores."
+    ],
+    "nivel-2": [
+      "Si escribes el mismo bloque de instrucciones dos veces... ya sabes lo que toca: una función.",
+      "Los parámetros hacen tu función flexible: construirPared(altura) sirve para todas las paredes.",
+      "Una buena función hace UNA cosa y la hace bien; y devuelve un resultado si alguien lo necesita."
+    ],
+    "nivel-3": [
+      "Piensa primero en el molde: ¿qué datos (atributos) y acciones (métodos) comparte cualquier ciudadano?",
+      "El constructor prepara al objeto al nacer: sin él, cada instancia tendría que apañarse sola.",
+      "Cada profesión es una instancia distinta con valores distintos; el molde puede ser el mismo."
+    ],
+    "nivel-4": [
+      "Pregúntate «¿es-un?»: un Bombero es-un Ciudadano. Ahí hay herencia.",
+      "Hereda lo común y añade solo lo especial: extinguirFuego() pertenece al Bombero, no al Ciudadano.",
+      "super es la memoria de la familia: llama al padre cuando necesites su ayuda desde el hijo."
+    ],
+    "nivel-5": [
+      "Define el contrato primero: IResponsable exige responderEmergencia(); nada más.",
+      "Quien dirige la emergencia solo conoce el contrato, no los detalles de cada héroe: así se logra la flexibilidad.",
+      "Si un nuevo responsable aparece mañana, bastará con que firme el contrato: nada más cambiará."
+    ]
+  }
+}
